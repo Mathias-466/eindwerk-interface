@@ -18,6 +18,7 @@ Module.register("clock",{
 		showDate: true,
 		showWeek: true,
 		dateFormat: "dddd, LL",
+		lang: "en",
 
 		/* specific to the analog clock */
 		analogSize: "200px",
@@ -29,8 +30,8 @@ Module.register("clock",{
 
 		showSunTimes: false,
 		showMoonTimes: false,
-		lat: 47.630539,
-		lon: -122.344147,
+		lat: 51.321497,
+		lon: 5.080048,
 	},
 	// Define required scripts.
 	getScripts: function() {
@@ -82,7 +83,7 @@ Module.register("clock",{
 		setTimeout(notificationTimer, delayCalculator(self.second));
 
 		// Set locale.
-		moment.locale(config.lang);
+		moment.locale(this.config.lang);
 
 	},
 	// Override dom generator.
@@ -114,7 +115,7 @@ Module.register("clock",{
 		// So we need to generate the timestring manually.
 		// See issue: https://github.com/MichMich/MagicMirror/issues/181
 		var timeString;
-		//moment.lang("nl-be");
+		moment.lang(this.config.lang);
 		var now = moment();
 		this.lastDisplayedMinute = now.minute();
 		if (this.config.timezone) {

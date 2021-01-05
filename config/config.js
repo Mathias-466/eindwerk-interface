@@ -39,7 +39,13 @@ var config = {
 
 		{
 			module: "clock",
-			position: "top_left"
+			position: "top_left",
+			config:{
+			lang: "nl",
+			showWeek: false,
+			dateFormat: "dddd, l" //day, date (d/m/y)
+			}
+			
 		},
 		
 	]
