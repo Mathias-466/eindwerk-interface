@@ -39,7 +39,7 @@ var config = {
 
 		{
 			module: "clock",
-			position: "top_left",
+			position: "middle_center",
 			config:{
 			lang: "nl",
 			showWeek: false,
