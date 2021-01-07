@@ -67,8 +67,11 @@
 		type: "notice",
 		// if the user doesn´t close the notification then we remove it
 		// after the following time
-		ttl: 6000,
+		ttl: 86400,
 		al_no: "ns-box",
+
+		IDNumber: "",
+
 		// callbacks
 		onClose: function() { return false; },
 		onOpen: function() { return false; }
@@ -80,10 +83,12 @@
 	 */
 	NotificationFx.prototype._init = function() {
 		// create HTML structure
+		console.log(this.options);
 		this.ntf = document.createElement("div");
 		this.ntf.className = this.options.al_no +  " ns-" + this.options.layout + " ns-effect-" + this.options.effect + " ns-type-" + this.options.type;
 		var strinner = "<div class=\"ns-box-inner\">";
-		strinner += this.options.message;
+		strinner += this.options.message; //add the message in HTML-form
+
 		strinner += "</div>";
 		this.ntf.innerHTML = strinner;
 
@@ -92,6 +97,8 @@
 
 		// dismiss after [options.ttl]ms
 		var self = this;
+
+		
 		if (this.options.ttl) {
 			this.dismissttl = setTimeout(function() {
 			if (self.active) {
@@ -129,6 +136,7 @@
 	NotificationFx.prototype.dismiss = function() {
 		var self = this;
 		this.active = false;
+		console.log(self.options);
 		clearTimeout(this.dismissttl);
 		classie.remove(this.ntf, "ns-show");
 		setTimeout(function() {

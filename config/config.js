@@ -47,6 +47,20 @@ var config = {
 			}
 			
 		},
+{
+		module: "alert",
+		config: {
+			display_time: 86400000, //24h
+		}
+	},
+	{
+		module: "MMMM-firebase",
+		position: "top_right",
+
+		config: {
+		
+		}
+	},
 		
 	]
 

@@ -14,7 +14,7 @@ Module.register("alert",{
 		// scale|slide|genie|jelly|flip|bouncyflip|exploader
 		alert_effect: "jelly",
 		//time a notification is displayed in seconds
-		display_time: 3500,
+		display_time: 35000,
 		//Position
 		position: "center",
 		//shown at startup
@@ -38,20 +38,21 @@ Module.register("alert",{
 		if (this.config.effect === "slide") {this.config.effect = this.config.effect + "-" + this.config.position;}
 		msg = "";
 		if (message.title) {
-			msg += "<span class='thin dimmed medium'>" + message.title + "</span>";
+			msg += "<span class='thin bright lagre'>" + message.title + "</span>";
 		}
 		if (message.message){
 			if (msg !== ""){
 				msg+= "<br />";
 			}
-			msg += "<span class='light bright small'>" + message.message + "</span>";
+			msg += "<span class='light bright large'>" + message.message + "</span>";
 		}
 
 		new NotificationFx({
 			message: msg,
 			layout: "growl",
+			IDNumber: message.IDNumber,
 			effect: this.config.effect,
-			ttl: message.timer !== undefined ? message.timer : this.config.display_time
+		ttl: message.timer !== undefined ? message.timer : this.config.display_time
 		}).show();
 	},
 	show_alert: function(params, sender) {
