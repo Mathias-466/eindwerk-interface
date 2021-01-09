@@ -58,9 +58,24 @@ var config = {
 		position: "top_right",
 
 		config: {
-		
+			firebaseConfig: {
+				apiKey: "AIzaSyAgyFYGbl6y2XzP-pHo2pAFCTX2_2DFSL0",
+				authDomain: "test-42bc4.firebaseapp.com",
+				databaseURL: "https://test-42bc4.firebaseio.com",
+				projectId: "test-42bc4",
+				storageBucket: "test-42bc4.appspot.com",
+			   // messagingSenderId: "977128456065",
+				appId: "1:977128456065:web:96ba7785ad6ea4d7537280",
+				measurementId: "G-PVL9NTZ3FE"
+			  },
 		}
 	},
+
+	{
+		module: "MMMM-processing",
+		position: "top_left",
+
+	}
 		
 	]
 
