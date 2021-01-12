@@ -3,8 +3,8 @@ Module.register("MMMM-processing",{
 	defaults: {
 
 	},
-
-
+	
+	FirebaseData: [],
 
 	// Define required scripts.
 	getScripts: function() {
@@ -21,18 +21,31 @@ Module.register("MMMM-processing",{
 	},
 	// Override dom generator.
 	getDom: function() {
+		this.sendNotification("SHOW_ALERT", {type: "notification",title: "Waarschuwing", message: "Dit is een test.", IDNumber: 01});        
+
 		var wrapper = document.createElement("div");
 
-		// Return the wrapper to the dom.
 		return wrapper;
     },
-    
+	
+	
 
     notificationReceived: function(notification, payload, sender) {
         if (notification == "FIREBASE_DATA-UPDATE") {
-            console.log("Updated firebase data: ",  payload);
-        } 
-    }
+			console.log("Updated firebase data: ",  payload);
+			this.FirebaseData = payload;
+			this.CheckData(this.FirebaseData);
+		} 
+
+		if (notification == "ALERT_CLOSED") {
+			console.log("Notification closed: ",  payload.IDNumber);
+	
+		} 
+	},
+	
+	CheckData: function(data){
+
+	}
 
 
 });

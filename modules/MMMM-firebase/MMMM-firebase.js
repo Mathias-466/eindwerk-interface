@@ -57,7 +57,6 @@ Module.register("MMMM-firebase",{
 	},
 	// Override dom generator.
 	getDom: function() {
-		this.sendNotification("SHOW_ALERT", {type: "notification",title: "Waarschuwing", message: "Dit is een test.", IDNumber: 01});        
 		var wrapper = document.createElement("div");
 
 		// Return the wrapper to the dom.

@@ -72,6 +72,8 @@
 
 		IDNumber: "",
 
+		module: [],
+
 		// callbacks
 		onClose: function() { return false; },
 		onOpen: function() { return false; }
@@ -83,7 +85,7 @@
 	 */
 	NotificationFx.prototype._init = function() {
 		// create HTML structure
-		console.log(this.options);
+	//	console.log(this.options);
 		this.ntf = document.createElement("div");
 		this.ntf.className = this.options.al_no +  " ns-" + this.options.layout + " ns-effect-" + this.options.effect + " ns-type-" + this.options.type;
 		var strinner = "<div class=\"ns-box-inner\">";
@@ -136,7 +138,8 @@
 	NotificationFx.prototype.dismiss = function() {
 		var self = this;
 		this.active = false;
-		console.log(self.options);
+	//	console.log(self.options);
+		self.options.module.sendNotification("ALERT_CLOSED",self.options);
 		clearTimeout(this.dismissttl);
 		classie.remove(this.ntf, "ns-show");
 		setTimeout(function() {

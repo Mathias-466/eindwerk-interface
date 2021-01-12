@@ -52,6 +52,7 @@ Module.register("alert",{
 			layout: "growl",
 			IDNumber: message.IDNumber,
 			effect: this.config.effect,
+			module: this,
 		ttl: message.timer !== undefined ? message.timer : this.config.display_time
 		}).show();
 	},
