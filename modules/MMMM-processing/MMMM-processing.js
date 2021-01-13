@@ -3,13 +3,14 @@ Module.register("MMMM-processing",{
 	defaults: {
 	minTemp: 	18,
 	maxTemp:	25,
-	reactionTime: 900000 //15min (in milliseconden)
-
+	reactionTime: 900000, //15min (in milliseconden)
+	snoozeTime: 900000, 
 	},
 	
 	FirebaseData: [],
 	OpenNotifications:[],
 	Tempwarning: false,
+	IDNumber: 1,
 
 	// Define required scripts.
 	getScripts: function() {
@@ -19,10 +20,7 @@ Module.register("MMMM-processing",{
 	start: function() {
 
 		Log.info("Starting module: " + this.name);
-
-		var self = this;
 		
-
 	},
 	// Override dom generator.
 	getDom: function() {
@@ -42,8 +40,13 @@ Module.register("MMMM-processing",{
 		} 
 		
 		if (notification === "ALERT_CLOSED") {
-			console.log("Notification closed: ",  payload.IDNumber);
-	
+			//console.log("Notification closed: ",  payload);
+			this.removeNotification(payload);
+			this.CheckTypes();
+		} 
+		else if (notification === "ALERT_OPENED") {
+			//console.log("Notification opened: ",  payload);
+			this.OpenNotifications.push(payload);
 		} 
 	},
 
@@ -56,11 +59,13 @@ Module.register("MMMM-processing",{
 			}
 		}
 		if (typeof openDWLoc !== 'undefined' && openDWLoc.length > 0) {
-			self.sendNotification("SHOW_ALERT", {type: "notification",title: "Waarschuwing", message: "Controleer uw verwarming en de deuren en ramen in: "+ openDWLoc.slice(0, -4).toLowerCase(), IDNumber: 01});        
+			self.sendNotification("SHOW_ALERT", {type: "notification",title: "Waarschuwing", message: "Controleer uw verwarming en de deuren en ramen in: "+ openDWLoc.slice(0, -4).toLowerCase(), IDNumber: self.IDNumber, typeWarning: "temp"});   
+     
 		}else{
-			self.sendNotification("SHOW_ALERT", {type: "notification",title: "Waarschuwing", message: "Controleer uw verwarming", IDNumber: 01});        
+			self.sendNotification("SHOW_ALERT", {type: "notification",title: "Waarschuwing", message: "Controleer uw verwarming", IDNumber: self.IDNumber, typeWarning: "temp"});        
 		}
-		this.Tempwarning = true;
+		self.IDNumber += 1;
+		self.Tempwarning = true;
 	},
 
 	Checktemp: function(fulldata){
@@ -82,13 +87,49 @@ Module.register("MMMM-processing",{
 	},
 
 	CheckCO: function(data){
-
+		//this.sendNotification("SHOW_ALERT", {type: "notification",title: "Waarschuwing", message: "Controleer uw Verluchting", IDNumber: self.IDNumber, typeWarning: "gas"});
+		//this.IDNumber += 1;
 	},
 	
 	CheckSensors: function(data){
 		this.Checktemp(data);
 		this.CheckCO(data.Gasmelder);
+	},
+
+	removeNotification: function(data){
+		var self = this;
+		for(i=0;i<this.OpenNotifications.length;i++){
+			if(self.OpenNotifications[i].IDNumber == data){
+				self.OpenNotifications.splice(i,1);
+				break;
+			}
+		}
+		console.log("Open notification: " + this.OpenNotifications.length);
+	},
+
+	CheckTypes: function(){
+		var self =this;
+		var tempTimeout;
+		var d = new Date();
+		if (typeof this.OpenNotifications !== 'undefined' && this.OpenNotifications.length > 0) {
+
+		var tempFound = false;
+		for(i=0;i<this.OpenNotifications.length;i++){
+			//console.log(self.OpenNotifications[i].typeWarning);
+			if(self.OpenNotifications[i].typeWarning == "temp"){
+				tempFound = true;
+			}
+		}
 	}
 
+	if(!tempFound){
+		if(!tempTimeout){
+			tempTimeout = setTimeout(function(){
+				self.Tempwarning = false;
+			}, self.config.snoozeTime);	
+		}
+		console.log("no temp warnings");
+	}
+}
 
 });

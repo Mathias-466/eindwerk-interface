@@ -72,6 +72,8 @@
 
 		IDNumber: "",
 
+		timestamp: 0,
+		
 		module: [],
 
 		// callbacks
@@ -130,6 +132,7 @@
 		classie.remove(this.ntf, "ns-hide");
 		classie.add(this.ntf, "ns-show");
 		this.options.onOpen();
+		this.options.module.sendNotification("ALERT_OPENED",this.options);
 	};
 
 	/**
@@ -139,7 +142,7 @@
 		var self = this;
 		this.active = false;
 	//	console.log(self.options);
-		self.options.module.sendNotification("ALERT_CLOSED",self.options);
+		self.options.module.sendNotification("ALERT_CLOSED",self.options.IDNumber);
 		clearTimeout(this.dismissttl);
 		classie.remove(this.ntf, "ns-show");
 		setTimeout(function() {

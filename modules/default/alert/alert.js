@@ -47,10 +47,14 @@ Module.register("alert",{
 			msg += "<span class='light bright large'>" + message.message + "</span>";
 		}
 
+		var d = new Date();
+
 		new NotificationFx({
 			message: msg,
 			layout: "growl",
 			IDNumber: message.IDNumber,
+			timestamp: d.getTime(),
+			typeWarning: message.typeWarning,
 			effect: this.config.effect,
 			module: this,
 		ttl: message.timer !== undefined ? message.timer : this.config.display_time
