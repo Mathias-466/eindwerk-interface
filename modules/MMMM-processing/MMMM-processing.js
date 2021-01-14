@@ -3,14 +3,17 @@ Module.register("MMMM-processing",{
 	defaults: {
 	minTemp: 	18,
 	maxTemp:	25,
-	reactionTime: 900000, //15min (in milliseconden)
-	snoozeTime: 900000, 
+	//reactionTime: 900000, //15min (in milliseconden)
+	reactionTime: 5000,
+	snoozeTime: 900000, //time between closing notification and recieving the same notification if there is no change in values 
+	contactPersoon: "mathias.jespers@gmail.com"
 	},
 	
 	FirebaseData: [],
 	OpenNotifications:[],
 	Tempwarning: false,
 	IDNumber: 1,
+	CheckEvery: 300000, //5min //for timestamps
 
 	// Define required scripts.
 	getScripts: function() {
@@ -20,6 +23,8 @@ Module.register("MMMM-processing",{
 	start: function() {
 
 		Log.info("Starting module: " + this.name);
+
+		this.CheckTimestamps();
 		
 	},
 	// Override dom generator.
@@ -59,10 +64,10 @@ Module.register("MMMM-processing",{
 			}
 		}
 		if (typeof openDWLoc !== 'undefined' && openDWLoc.length > 0) {
-			self.sendNotification("SHOW_ALERT", {type: "notification",title: "Waarschuwing", message: "Controleer uw verwarming en de deuren en ramen in: "+ openDWLoc.slice(0, -4).toLowerCase(), IDNumber: self.IDNumber, typeWarning: "temp"});   
+			self.sendNotification("SHOW_ALERT", {type: "notification",title: "Waarschuwing ", message: "Controleer uw verwarming en de deuren en ramen in: "+ openDWLoc.slice(0, -4).toLowerCase(), IDNumber: self.IDNumber, typeWarning: "temp"});   
      
 		}else{
-			self.sendNotification("SHOW_ALERT", {type: "notification",title: "Waarschuwing", message: "Controleer uw verwarming", IDNumber: self.IDNumber, typeWarning: "temp"});        
+			self.sendNotification("SHOW_ALERT", {type: "notification",title: "Waarschuwing ", message: "Controleer uw verwarming", IDNumber: self.IDNumber, typeWarning: "temp"});        
 		}
 		self.IDNumber += 1;
 		self.Tempwarning = true;
@@ -87,8 +92,10 @@ Module.register("MMMM-processing",{
 	},
 
 	CheckCO: function(data){
-		//this.sendNotification("SHOW_ALERT", {type: "notification",title: "Waarschuwing", message: "Controleer uw Verluchting", IDNumber: self.IDNumber, typeWarning: "gas"});
-		//this.IDNumber += 1;
+	var self = this;
+		this.sendNotification("SHOW_ALERT", {type: "notification",title: "Waarschuwing ", message: "Controleer uw Verluchting", IDNumber: self.IDNumber, typeWarning: "gas"});
+		this.IDNumber += 1;
+		
 	},
 	
 	CheckSensors: function(data){
@@ -130,6 +137,32 @@ Module.register("MMMM-processing",{
 		}
 		console.log("no temp warnings");
 	}
+},
+
+CheckTimestamps: function(){
+var self = this;
+var d = new Date();
+
+if (typeof this.OpenNotifications !== 'undefined' && this.OpenNotifications.length > 0) {
+	for(i=0;i<this.OpenNotifications.length;i++){
+		if(d.getTime() - self.OpenNotifications[i].timestamp > self.config.reactionTime ){
+			console.log("ReactionTime passed for: ",self.OpenNotifications[i].IDNumber)
+			self.sendSocketNotification("SEND_EMAIL",{
+				message: self.OpenNotifications[i].message.replace(/(<([^>]+)>)/gi, ""),
+				reciever: self.config.contactPersoon
+			});
+			self.OpenNotifications.splice(i,1);
+		}
+	}
+}
+/*
+	setTimeout(function(){
+		self.CheckTimestamps()
+	}, self.CheckEvery);	
+*/
+setTimeout(function(){
+	self.CheckTimestamps()
+}, 1000);
 }
 
 });
