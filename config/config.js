@@ -50,7 +50,7 @@ var config = {
 {
 		module: "alert",
 		config: {
-			display_time: 43200000, //12h
+			display_time: 3600000, //1h
 		}
 	},
 	{
