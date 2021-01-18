@@ -115,7 +115,7 @@ Module.register("clock",{
 		// So we need to generate the timestring manually.
 		// See issue: https://github.com/MichMich/MagicMirror/issues/181
 		var timeString;
-		moment.lang(this.config.lang);
+		moment.locale(this.config.lang);
 		var now = moment();
 		this.lastDisplayedMinute = now.minute();
 		if (this.config.timezone) {
