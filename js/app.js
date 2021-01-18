@@ -62,8 +62,6 @@ var App = function() {
 		var configFilename;
 	
 		configFilename = path.resolve(global.root_path + "/config/config.js");
-	
-
 		if (typeof(global.configuration_file) !== "undefined") {
 			configFilename = path.resolve(global.configuration_file);
 		}

@@ -155,14 +155,15 @@ if (typeof this.OpenNotifications !== 'undefined' && this.OpenNotifications.leng
 		}
 	}
 }
-/*
+
 	setTimeout(function(){
 		self.CheckTimestamps()
 	}, self.CheckEvery);	
-*/
+
+/*
 setTimeout(function(){
 	self.CheckTimestamps()
 }, 1000);
+*/
 }
-
 });

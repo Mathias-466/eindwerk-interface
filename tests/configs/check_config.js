@@ -25,8 +25,8 @@ function getConfigFile() {
 	// FIXME: This function should be in core. Do you want refactor me ;) ?, be good!
 	rootPath = path.resolve(__dirname + "/../../");
 	var configFileName;
-	
-	var configFileName = path.resolve(rootPath + "/config/config.js");
+
+	configFileName = path.resolve(rootPath + "/config/config.js");
 	if (process.env.MM_CONFIG_FILE) {
 		configFileName = path.resolve(process.env.MM_CONFIG_FILE);
 	}
