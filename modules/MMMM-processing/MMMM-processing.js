@@ -3,8 +3,8 @@ Module.register("MMMM-processing",{
 	defaults: {
 	minTemp: 	18,
 	maxTemp:	25,
-	//reactionTime: 900000, //15min (in milliseconden)
-	reactionTime: 5000,
+	reactionTime: 900000, //15min (in milliseconden)
+	//reactionTime: 5000,
 	snoozeTime: 900000, //time between closing notification and recieving the same notification if there is no change in values 
 	contactPersoon: "mathias.jespers@gmail.com"
 	},
@@ -142,7 +142,7 @@ Module.register("MMMM-processing",{
 CheckTimestamps: function(){
 var self = this;
 var d = new Date();
-
+console.log("checking..");
 if (typeof this.OpenNotifications !== 'undefined' && this.OpenNotifications.length > 0) {
 	for(i=0;i<this.OpenNotifications.length;i++){
 		if(d.getTime() - self.OpenNotifications[i].timestamp > self.config.reactionTime ){
