@@ -24,8 +24,8 @@ module.exports = NodeHelper.create({
 	var mailOptions = {
  		from: 'interface.helper@outlook.com',
   		to: data.reciever,
-  		subject: 'Geen reactie op melding',
-  		text: "Er werd niet gereageerd op volgende melding: " + data.message
+  		subject: 'Geen reactie op melding voor: ' + data.owner,
+  		text: data.owner + " heeft niet gereageerd op volgende melding: " + data.message
 	};
 
 	transporter.sendMail(mailOptions, function(error, info){

@@ -3,7 +3,7 @@ Module.register("MMMM-processing",{
 	defaults: {
 		minTemp: 	18,
 		maxTemp:	25,
-		reactionTime: 900000, //15min (in milliseconden) //time it takes to respeond on a notification before a warning(email) is send
+		reactionTime: 900000, //15min (in milliseconden) //time it takes to respond on a notification before a warning(email) is send
 		snoozeTime: 900000, //time between closing notification and recieving the same notification if there is no change in values 
 		contactPersoon: "mathias.jespers@gmail.com",
 		//InactiveTime: "23:15-7:30",
@@ -14,7 +14,7 @@ Module.register("MMMM-processing",{
 	OpenNotifications:[],
 	Tempwarning: false,
 	IDNumber: 1,
-	CheckEvery: 300000, //5min //for timestamps
+	CheckEvery: 2*60*1000, //2min //for timestamps
 	isActive: false,
 
 	// Define required scripts.
@@ -158,7 +158,8 @@ if(self.isActive){
 				console.log("ReactionTime passed for: ",self.OpenNotifications[i].IDNumber)
 				self.sendSocketNotification("SEND_EMAIL",{
 					message: self.OpenNotifications[i].message.replace(/(<([^>]+)>)/gi, ""),
-					reciever: self.config.contactPersoon
+					reciever: self.config.contactPersoon,
+					owner:  config.Owner
 				});
 				self.OpenNotifications.splice(i,1);
 			}

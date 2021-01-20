@@ -35,6 +35,8 @@ var config = {
 				 // true, force serveronly mode, because you want to.. no UI on this device
 				 
 
+	Owner: "Maria de Vries",
+
 	modules: [
 
 		{
