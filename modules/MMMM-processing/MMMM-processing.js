@@ -1,19 +1,21 @@
 Module.register("MMMM-processing",{
 	// Module config defaults.
 	defaults: {
-	minTemp: 	18,
-	maxTemp:	25,
-	reactionTime: 900000, //15min (in milliseconden)
-	//reactionTime: 5000,
-	snoozeTime: 900000, //time between closing notification and recieving the same notification if there is no change in values 
-	contactPersoon: "mathias.jespers@gmail.com"
+		minTemp: 	18,
+		maxTemp:	25,
+		reactionTime: 900000, //15min (in milliseconden) //time it takes to respeond on a notification before a warning(email) is send
+		snoozeTime: 900000, //time between closing notification and recieving the same notification if there is no change in values 
+		contactPersoon: "mathias.jespers@gmail.com",
+		//InactiveTime: "23:15-7:30",
+		InactiveTime: "14:41-14:45",	
 	},
 	
-	FirebaseData: [],
+	FirebaseData: "",
 	OpenNotifications:[],
 	Tempwarning: false,
 	IDNumber: 1,
 	CheckEvery: 300000, //5min //for timestamps
+	isActive: false,
 
 	// Define required scripts.
 	getScripts: function() {
@@ -23,8 +25,6 @@ Module.register("MMMM-processing",{
 	start: function() {
 
 		Log.info("Starting module: " + this.name);
-
-		this.CheckTimestamps();
 		
 	},
 	// Override dom generator.
@@ -38,10 +38,16 @@ Module.register("MMMM-processing",{
 	
 
     notificationReceived: function(notification, payload, sender) {
+		if (notification === "ALL_MODULES_STARTED") {
+			this.CheckTimestamps();
+			this.CheckActiveTime(this.config.InactiveTime);
+		} 
         if (notification === "FIREBASE_DATA-UPDATE") {
 			console.log("Updated firebase data: ",  payload);
-			this.CheckSensors(payload.Sensoren);
-
+			this.FirebaseData = payload;
+			if(this.isActive){
+				this.CheckSensors(payload.Sensoren);
+			}
 		} 
 		
 		if (notification === "ALERT_CLOSED") {
@@ -99,8 +105,10 @@ Module.register("MMMM-processing",{
 	},
 	
 	CheckSensors: function(data){
-		this.Checktemp(data);
-		this.CheckCO(data.Gasmelder);
+		if(data && data != ""){
+			this.Checktemp(data);
+			this.CheckCO(data.Gasmelder);
+		}
 	},
 
 	removeNotification: function(data){
@@ -141,29 +149,77 @@ Module.register("MMMM-processing",{
 
 CheckTimestamps: function(){
 var self = this;
-var d = new Date();
-console.log("checking..");
-if (typeof this.OpenNotifications !== 'undefined' && this.OpenNotifications.length > 0) {
-	for(i=0;i<this.OpenNotifications.length;i++){
-		if(d.getTime() - self.OpenNotifications[i].timestamp > self.config.reactionTime ){
-			console.log("ReactionTime passed for: ",self.OpenNotifications[i].IDNumber)
-			self.sendSocketNotification("SEND_EMAIL",{
-				message: self.OpenNotifications[i].message.replace(/(<([^>]+)>)/gi, ""),
-				reciever: self.config.contactPersoon
-			});
-			self.OpenNotifications.splice(i,1);
+if(self.isActive){
+	var d = new Date();
+	console.log("checking timestamps..");
+	if (typeof this.OpenNotifications !== 'undefined' && this.OpenNotifications.length > 0) {
+		for(i=0;i<this.OpenNotifications.length;i++){
+			if(d.getTime() - self.OpenNotifications[i].timestamp > self.config.reactionTime ){
+				console.log("ReactionTime passed for: ",self.OpenNotifications[i].IDNumber)
+				self.sendSocketNotification("SEND_EMAIL",{
+					message: self.OpenNotifications[i].message.replace(/(<([^>]+)>)/gi, ""),
+					reciever: self.config.contactPersoon
+				});
+				self.OpenNotifications.splice(i,1);
+			}
 		}
+	}
+}else{  /*If the system is inactive the open notifications can be removed*/ 
+	//console.log("removing open notification");
+	for(i=0;i<this.OpenNotifications.length;i++){
+		self.OpenNotifications.splice(i,1);
 	}
 }
 
-	setTimeout(function(){
-		self.CheckTimestamps()
-	}, self.CheckEvery);	
+setTimeout(function(){
+	self.CheckTimestamps()
+}, self.CheckEvery);	
 
 /*
 setTimeout(function(){
 	self.CheckTimestamps()
 }, 1000);
 */
+},
+
+
+CheckActiveTime: function(data){
+	var self = this;	
+	var lastActiveState = self.isActive;
+	var StartandEndTime = data.split("-");
+	var startTime = StartandEndTime[0].split(":");
+	var endTime = StartandEndTime[1].split(":");
+
+	var startTimeMin = parseInt(startTime[0]) * 60 + parseInt(startTime[1]);
+	var endTimeMin = parseInt(endTime[0]) * 60 + parseInt(endTime[1]);
+
+	var d = new Date();
+	var nowTimeMin = d.getHours() *60 + d.getMinutes()
+	
+	if(startTimeMin-endTimeMin > 0){ //night gap (23h-7h)
+		if(nowTimeMin<endTimeMin || nowTimeMin > startTimeMin){
+			self.isActive = false;
+		}else{self.isActive=true;}
+
+	}
+
+	else if(startTimeMin-endTimeMin < 0) { //1 day (20h-23h)
+		if(startTimeMin<nowTimeMin && nowTimeMin < endTimeMin){
+			self.isActive = false;
+		}else{self.isActive=true;}
+	}
+
+	self.sendNotification("ISACTIVE_STATE",self.isActive);
+
+	if(lastActiveState!=self.isActive && self.isActive){  //if the state changed from inactive to active
+		self.CheckSensors(self.FirebaseData.Sensoren);
+		console.log("ACTIVE state changed from inactive to active")
+	}
+	setTimeout(function(){
+		self.CheckActiveTime(self.config.InactiveTime)
+	}, 30 *1000);	//30s
+
 }
+
+
 });

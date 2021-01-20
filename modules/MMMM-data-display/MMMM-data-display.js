@@ -1,49 +1,60 @@
 Module.register("MMMM-data-display",{
-            // Module config defaults.
-            defaults: {
-        
-            },
-            
-            FirebaseData: [],
-            showSensorData: false,
-        
-            // Define required scripts.
-            getScripts: function() {
-                return [];
-            },
-            // Define start sequence.
-            start: function() {
-        
-                Log.info("Starting module: " + this.name);
-        
-                var self = this;
-                
-        
-            },
-            // Override dom generator.
-            getDom: function() {
-                var togglebutton = document.createElement("button");
-                togglebutton.innerHTML = "Open overzicht";
-        
-                wrapper.appendChild(togglebutton);
-                
-                togglebutton.addEventListener ("click", function() {
-                    this.showSensorData = !this.showSensorData;
-                  });
 
-                var wrapper = document.createElement("div");
+  defaults: {
         
-                return wrapper;
-            },
+    },
+
+    FirebaseData: [],
+    showSensorData: false,
+    isActiveState:  "Inactief",
+        
+   /*
+    getScripts: function() {
+        return [];
+    },
+         */   
+
+    start: function() {
+        
+        Log.info("Starting module: " + this.name);
+                        
+    },
+
+    // Override dom generator.
+    getDom: function() {
+    var self = this;
+        var wrapper = document.createElement("div");
+		wrapper.className = this.config.classes ? this.config.classes : "thin xlarge bright pre-line";
+        
+        
+        var compliment = document.createElement("span")
+        compliment.appendChild(document.createTextNode(self.isActiveState));
+		
+		
+		
+	    wrapper.appendChild(compliment);
+
+		return wrapper;
+        
+    },
             
             
         
-            notificationReceived: function(notification, payload, sender) {
-                if (notification == "FIREBASE_DATA-UPDATE") {
-                    console.log("Updated firebase data: ",  payload);
-                    this.FirebaseData = payload;
-                } 
-            }
+    notificationReceived: function(notification, payload, sender) {
+        if (notification == "FIREBASE_DATA-UPDATE") {
+            //  console.log("Updated firebase data: ",  payload);
+            this.FirebaseData = payload;
+        } 
+
+        if (notification == "ISACTIVE_STATE") {
+            if(payload){
+                this.isActiveState = "Actief";
+            }else{this.isActiveState = "Inactief";}
+            
+            this.updateDom();
+        }
+
+        }
         
         
-        });
+});

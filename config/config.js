@@ -75,8 +75,14 @@ var config = {
 		module: "MMMM-processing",
 		position: "top_left",
 
-	}
-		
+	},
+
+	
+	{
+		module: "MMMM-data-display",
+		position: "top_left",
+
+	},	
 	]
 
 };
