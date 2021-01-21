@@ -6,8 +6,8 @@ Module.register("MMMM-processing",{
 		reactionTime: 900000, //15min (in milliseconden) //time it takes to respond on a notification before a warning(email) is send
 		snoozeTime: 900000, //time between closing notification and recieving the same notification if there is no change in values 
 		contactPersoon: "mathias.jespers@gmail.com",
-		//InactiveTime: "23:15-7:30",
-		InactiveTime: "14:41-14:45",	
+		InactiveTime: "23:15-7:30",
+		//InactiveTime: "14:41-14:45",	
 	},
 	
 	FirebaseData: "",

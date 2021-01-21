@@ -20,12 +20,13 @@ module.exports = NodeHelper.create({
 	},
 
 	SendEmail: function(data){
-		
+		var self = this;
 	var mailOptions = {
  		from: 'interface.helper@outlook.com',
   		to: data.reciever,
   		subject: 'Geen reactie op melding voor: ' + data.owner,
-  		text: data.owner + " heeft niet gereageerd op volgende melding: " + data.message
+		text: data.owner + " heeft niet gereageerd op volgende melding: " + data.message,
+		html: self.GetHtmlTemplate(data), 
 	};
 
 	transporter.sendMail(mailOptions, function(error, info){
@@ -45,5 +46,77 @@ module.exports = NodeHelper.create({
 			this.SendEmail(payload);
 		}
 	},
+
+	GetHtmlTemplate: function(data){
+		var html = `
+		<div>
+        <div style="background:#4DBFBF;background-color:#4DBFBF;margin:0px auto;max-width:600px;">
+            <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:#4DBFBF;background-color:#4DBFBF;width:100%;">
+                <tbody>
+                    <tr>
+                        <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                            <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:collapse;border-spacing:0px;">
+                                <tr>
+                                    <td style="width:216px;">
+                                        <img alt="Robot image" height="189" src="https://assets.opensourceemails.com/imgs/neopolitan/robot-happy.png" style="border:none;display:block;font-size:13px;height:189px;outline:none;text-decoration:none;width:100%;" width="216">
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                            <div style="color:#FFFFFF;font-family:'Droid Sans', 'Helvetica Neue', Arial, sans-serif;font-size:36px;line-height:1;text-align:center;">
+                                Melding
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                            <div style="color:#187272;font-family:'Droid Sans', 'Helvetica Neue', Arial, sans-serif;font-size:16px;line-height:20px;text-align:center;">
+                                Sensoren hebben afwijkende metingen waargenomen en er werd niet gereageerd op een melding van het systeem.
+                                <br>
+                                <br>
+                                Hieronder de desbetreffende melding van ` + data.owner + `:
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+        <div style="background:#F5774E;background-color:#F5774E;margin:0px auto;max-width:600px;">
+            <table  align="center">
+                <tr>
+                    <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                        <div style="color:#933F24;font-family:'Droid Sans', 'Helvetica Neue', Arial, sans-serif;font-size:16px;line-height:20px;text-align:center;">
+						` + data.message +`
+                        </div>
+                    </td>
+                </tr>
+            </table>
+
+        </div>
+
+
+        <div style="background:#414141;background-color:#414141;margin:0px auto;max-width:600px;">
+            <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background:#414141;background-color:#414141;width:100%;">
+                <tbody>
+                    <tr>          
+                       <td align="center" style="font-size:0px;padding:10px 25px;word-break:break-word;">
+                            <div style="color:#BBBBBB;font-family:'Droid Sans', 'Helvetica Neue', Arial, sans-serif;font-size:12px;line-height:1;text-align:center;">
+                                U kan niet reageren op dit bericht
+                            </div>
+                       </td>                                    
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+   </div>
+		`;
+
+		return html;
+	}
 					
 });
