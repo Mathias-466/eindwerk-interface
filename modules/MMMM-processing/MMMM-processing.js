@@ -4,7 +4,8 @@ Module.register("MMMM-processing",{
 		minTemp: 	18,
 		maxTemp:	25,
 		reactionTime: 900000, //15min (in milliseconden) //time it takes to respond on a notification before a warning(email) is send
-		snoozeTime: 900000, //time between closing notification and recieving the same notification if there is no change in values 
+		//snoozeTime: 900000, //time between closing notification and recieving the same notification if there is no change in values 
+		snoozeTime: 2*60*1000,
 		contactPersoon: "mathias.jespers@gmail.com",
 		InactiveTime: "23:15-7:30",
 		//InactiveTime: "14:41-14:45",	
@@ -13,6 +14,7 @@ Module.register("MMMM-processing",{
 	FirebaseData: "",
 	OpenNotifications:[],
 	Tempwarning: false,
+	Gaswarning: false,
 	IDNumber: 1,
 	CheckEvery: 2*60*1000, //2min //for timestamps
 	isActive: false,
@@ -63,7 +65,7 @@ Module.register("MMMM-processing",{
 
 	CheckDoorsWindows: function(data){
 		var self = this;
-		var openDWLoc = "";
+		var openDWLoc = "";  //string with the place of open doors and windows
 		for(var i=0;i<data.length;i++){
 			if(data[i].Waarde){ //if door value = 1, the door/window is open
 				openDWLoc += data[i].Plaats + " en ";
@@ -84,24 +86,35 @@ Module.register("MMMM-processing",{
 		var maxtemp = this.config.maxTemp;
 		var self = this;
 		if(!self.Tempwarning){
-		var tempData = fulldata.Temperatuur;
-		var DWData = fulldata.DeurRaam;
+			var tempData = fulldata.Temperatuur;
+			var DWData = fulldata.DeurRaam;
 		
-	for(var i=0;i<tempData.length;i++){
-			if(tempData[i].Waarde < mintemp || tempData[i].Waarde > maxtemp){
-				console.log("WARNING: TEMP OOR");
-				self.CheckDoorsWindows(DWData);	
-				break;
-			}	
+			for(var i=0;i<tempData.length;i++){
+				if(tempData[i].Waarde < mintemp || tempData[i].Waarde > maxtemp){
+					console.log("WARNING: TEMP OOR");
+					self.CheckDoorsWindows(DWData);	
+					break;
+				}	
+			}
 		}
-	}
 	},
 
 	CheckCO: function(data){
 	var self = this;
-		this.sendNotification("SHOW_ALERT", {type: "notification",title: "Waarschuwing ", message: "Controleer uw Verluchting", IDNumber: self.IDNumber, typeWarning: "gas"});
-		this.IDNumber += 1;
-		
+
+	if(!self.Gaswarning){  // if there is no existing temp warning
+		for(var i=0;i<data.length;i++){
+			if(data[i].Waarde == 1){
+				console.log("WARNING: GAS OOR");
+				this.sendNotification("SHOW_ALERT", {type: "notification",title: "Waarschuwing ", message: "Controleer uw verluchting", IDNumber: self.IDNumber, typeWarning: "gas"});
+				this.IDNumber += 1;
+				self.Gaswarning = true;
+				break;
+			}	
+		}
+	}
+
+	
 	},
 	
 	CheckSensors: function(data){
@@ -124,27 +137,41 @@ Module.register("MMMM-processing",{
 
 	CheckTypes: function(){
 		var self =this;
-		var tempTimeout;
-		var d = new Date();
+
 		if (typeof this.OpenNotifications !== 'undefined' && this.OpenNotifications.length > 0) {
 
-		var tempFound = false;
-		for(i=0;i<this.OpenNotifications.length;i++){
-			//console.log(self.OpenNotifications[i].typeWarning);
-			if(self.OpenNotifications[i].typeWarning == "temp"){
-				tempFound = true;
+			/*Check for open temp and gas notifications*/
+			var tempFound = false;
+			var gasFound = false;
+
+			for(i=0;i<this.OpenNotifications.length;i++){
+				//console.log(self.OpenNotifications[i].typeWarning);
+				if(self.OpenNotifications[i].typeWarning == "temp"){
+					tempFound = true;
+				}
+
+				if(self.OpenNotifications[i].typeWarning == "gas"){
+					gasFound = true;
+				}
 			}
 		}
-	}
 
-	if(!tempFound){
-		if(!tempTimeout){
-			tempTimeout = setTimeout(function(){
+		if(!tempFound){ //if there was no temp warning found in the open notifications
+			/*Set a timeout to set tempwarning to false the after the snoozing time*/
+			setTimeout(function(){
 				self.Tempwarning = false;
-			}, self.config.snoozeTime);	
+			}, self.config.snoozeTime);				
+			
+			console.log("no temp warnings");
 		}
-		console.log("no temp warnings");
-	}
+
+		if(!gasFound){
+			setTimeout(function(){
+				self.Gaswarning = false;
+			}, self.config.snoozeTime);	
+			
+			console.log("no gas warnings");
+		}
 },
 
 CheckTimestamps: function(){
