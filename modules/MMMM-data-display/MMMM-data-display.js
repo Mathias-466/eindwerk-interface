@@ -24,7 +24,7 @@ Module.register("MMMM-data-display",{
     getDom: function() {
     var self = this;
         var wrapper = document.createElement("div");
-		wrapper.className = this.config.classes ? this.config.classes : "thin xlarge bright pre-line";
+		wrapper.className = this.config.classes ? this.config.classes : "thin medium bright pre-line";
         
         
         var compliment = document.createElement("span")
