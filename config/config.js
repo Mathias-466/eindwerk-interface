@@ -36,6 +36,7 @@ var config = {
 				 
 
 	Owner: "Maria de Vries",
+	Os: "Windows",
 
 	modules: [
 
