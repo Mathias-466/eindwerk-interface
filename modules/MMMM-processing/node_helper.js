@@ -1,5 +1,11 @@
 var NodeHelper = require("node_helper");
 var nodemailer = require('nodemailer');
+const { config } = require("chai");
+
+if(config.OS === "RPI"){
+var {PythonShell} = require('python-shell')
+var pyshell = new PythonShell('/home/pi/Documents/Eindwerk_STEM/eindwerk-interface/python/code.py');
+}
 
 var transporter = nodemailer.createTransport({
 	service: 'outlook',
@@ -38,14 +44,37 @@ module.exports = NodeHelper.create({
 	  
 	});
 	return;
-	},
-	// Override socketNotificationReceived method.
-	socketNotificationReceived: function(notification, payload) {
+    },
+    
+    socketNotificationReceived: function(notification, payload) {
 		if (notification === "SEND_EMAIL") {
 			console.log("HELPER RECIEVED: email request");
 			this.SendEmail(payload);
-		}
-	},
+        }
+        
+        if (notification === "CHANGE_RPI_OUTPUT") {
+			this.RPIIO(payload);
+        }
+/*
+
+pyshell.end(function (err,code,signal) {
+  if (err) throw err;
+  console.log('The exit code was: ' + code);
+  console.log('The exit signal was: ' + signal);
+  console.log('finished');
+});
+*/
+    },
+    
+    RPIIO: function(instruction){
+        var self = this;
+        console.log("Request to RPI: " + instruction);
+if(pyshell){
+       
+		pyshell.send(instruction);
+          
+}else{console.log("NO SHELL DECLARED");}
+    },
 
 	GetHtmlTemplate: function(data){
 		var html = `

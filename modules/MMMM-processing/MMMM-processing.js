@@ -18,6 +18,7 @@ Module.register("MMMM-processing",{
 	IDNumber: 1,
 	CheckEvery: 2*60*1000, //2min //for timestamps
 	isActive: false,
+	RPIIOon: false, //if the output of the RPI is set
 
 	// Define required scripts.
 	getScripts: function() {
@@ -55,11 +56,14 @@ Module.register("MMMM-processing",{
 		if (notification === "ALERT_CLOSED") {
 			//console.log("Notification closed: ",  payload);
 			this.removeNotification(payload);
+			this.setRPIOI();
 			this.CheckTypes();
 		} 
 		else if (notification === "ALERT_OPENED") {
 			//console.log("Notification opened: ",  payload);
 			this.OpenNotifications.push(payload);
+			this.setRPIOI();
+			this.sendPythonNotification("SOUND_NEWMESSAGE");
 		} 
 	},
 
@@ -247,7 +251,31 @@ CheckActiveTime: function(data){
 		self.CheckActiveTime(self.config.InactiveTime)
 	}, 30 *1000);	//30s
 
+},
+
+sendPythonNotification(notification){
+var self = this;
+if(config.Os == "RPI"){
+	self.sendSocketNotification("CHANGE_RPI_OUTPUT",notification);
 }
 
+},
+
+setRPIOI: function(){
+	var self = this;
+if(config.Os == "RPI"){
+	if(self.OpenNotifications.length == 0){
+		//no output signal
+		self.RPIIOon = false;
+		self.sendSocketNotification("CHANGE_RPI_OUTPUT","LED_OFF");
+	}else{
+		//output signal
+		if(!self.RPIIOon){ //if there is no output signal active
+			self.RPIIOon = true;
+			self.sendSocketNotification("CHANGE_RPI_OUTPUT","LED_ON");
+		}
+	}
+}
+}
 
 });
