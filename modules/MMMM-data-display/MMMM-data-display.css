@@ -1,0 +1,30 @@
+.Button  {
+    background-color: #f56200;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+  }
+
+  .SensorDataDiv{
+  width: 100%;
+  height: 100%;
+  background-color: #000000;
+  color: white;
+
+  }
+
+  .dataContent{
+    margin:10px;
+
+    font-family: Roboto, sans-serif;
+    font-weight: 100;
+    
+  }
+
+  ul{
+    margin: 0;
+  }
